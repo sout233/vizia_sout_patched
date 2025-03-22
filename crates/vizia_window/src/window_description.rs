@@ -26,29 +26,67 @@ impl From<WindowSize> for (u32, u32) {
     }
 }
 
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Anchor {
+    #[default]
+    TopLeft,
+    TopCenter,
+    TopRight,
+    Left,
+    Center,
+    Right,
+    BottomLeft,
+    BottomCenter,
+    BottomRight,
+}
+
+impl Anchor {
+    pub fn opposite(&self) -> Self {
+        match self {
+            Anchor::TopLeft => Anchor::BottomLeft,
+            Anchor::TopCenter => Anchor::BottomCenter,
+            Anchor::TopRight => Anchor::BottomRight,
+            Anchor::Left => Anchor::Right,
+            Anchor::Center => Anchor::Center,
+            Anchor::Right => Anchor::Left,
+            Anchor::BottomLeft => Anchor::TopLeft,
+            Anchor::BottomCenter => Anchor::TopCenter,
+            Anchor::BottomRight => Anchor::TopRight,
+        }
+    }
+}
+
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AnchorTarget {
+    #[default]
+    Monitor,
+    Window,
+    Mouse,
+}
+
 /// The logical position of a window in screen coordinates.
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct WindowPosition {
     /// The x coordinate of the position.
-    pub x: u32,
+    pub x: i32,
     /// The y coordinate of the position.
-    pub y: u32,
+    pub y: i32,
 }
 
 impl WindowPosition {
     /// Creates a new window position.
-    pub fn new(x: u32, y: u32) -> Self {
+    pub fn new(x: i32, y: i32) -> Self {
         WindowPosition { x, y }
     }
 }
 
-impl From<(u32, u32)> for WindowPosition {
-    fn from(s: (u32, u32)) -> Self {
+impl From<(i32, i32)> for WindowPosition {
+    fn from(s: (i32, i32)) -> Self {
         WindowPosition::new(s.0, s.1)
     }
 }
 
-impl From<WindowPosition> for (u32, u32) {
+impl From<WindowPosition> for (i32, i32) {
     fn from(s: WindowPosition) -> Self {
         (s.x, s.y)
     }
@@ -73,6 +111,10 @@ pub struct WindowDescription {
     /// A scale factor applied on top of any DPI scaling, defaults to 1.0.
     pub user_scale_factor: f64,
     pub position: Option<WindowPosition>,
+    pub offset: Option<WindowPosition>,
+    pub anchor: Option<Anchor>,
+    pub anchor_target: Option<AnchorTarget>,
+    pub parent_anchor: Option<Anchor>,
     pub resizable: bool,
     pub minimized: bool,
     pub maximized: bool,
@@ -98,6 +140,10 @@ impl Default for WindowDescription {
             max_inner_size: None,
             user_scale_factor: 1.0,
             position: None,
+            offset: None,
+            anchor: None,
+            anchor_target: None,
+            parent_anchor: None,
             resizable: true,
             minimized: true,
             maximized: false,

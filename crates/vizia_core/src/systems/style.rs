@@ -196,7 +196,7 @@ impl Element for Node<'_, '_> {
                 }
                 PseudoClass::ReadOnly => psudeo_class_flag.contains(PseudoClassFlags::READ_ONLY),
                 PseudoClass::ReadWrite => psudeo_class_flag.contains(PseudoClassFlags::READ_WRITE),
-                PseudoClass::PlaceHolderShown => {
+                PseudoClass::PlaceholderShown => {
                     psudeo_class_flag.contains(PseudoClassFlags::PLACEHOLDER_SHOWN)
                 }
                 PseudoClass::Default => psudeo_class_flag.contains(PseudoClassFlags::DEFAULT),
@@ -353,6 +353,33 @@ fn link_style_data(
     if style.opacity.link(entity, matched_rules) {
         should_redraw = true;
     }
+
+    // Grid
+    if style.grid_columns.link(entity, matched_rules) {
+        should_relayout = true;
+    }
+
+    if style.grid_rows.link(entity, matched_rules) {
+        should_relayout = true;
+    }
+
+    if style.column_start.link(entity, matched_rules) {
+        should_relayout = true;
+    }
+
+    if style.column_span.link(entity, matched_rules) {
+        should_relayout = true;
+    }
+
+    if style.row_start.link(entity, matched_rules) {
+        should_relayout = true;
+    }
+
+    if style.row_span.link(entity, matched_rules) {
+        should_relayout = true;
+    }
+
+    // Position
 
     if style.left.link(entity, matched_rules) {
         should_relayout = true;

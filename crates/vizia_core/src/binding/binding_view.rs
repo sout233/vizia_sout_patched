@@ -1,7 +1,7 @@
 use hashbrown::{HashMap, HashSet};
 use std::any::TypeId;
 
-use crate::binding::{get_storeid, BasicStore, Store, StoreId};
+use crate::binding::{BasicStore, Store, StoreId};
 use crate::context::{CURRENT, MAPS, MAP_MANAGER};
 use crate::model::ModelOrView;
 use crate::prelude::*;
@@ -72,7 +72,7 @@ where
             }
 
             if let Some(stores) = stores.get_mut(&entity) {
-                let key = get_storeid(&lens);
+                let key = lens.id();
 
                 if let Some(store) = stores.get_mut(&key) {
                     let observers = store.observers();
@@ -156,6 +156,7 @@ impl<L: 'static + Lens> BindingHandler for Binding<L> {
     fn update(&mut self, cx: &mut Context) {
         cx.remove_children(cx.current());
 
+        // Remove all maps that are associated with this binding.
         MAP_MANAGER.with_borrow_mut(|manager| {
             MAPS.with_borrow_mut(|maps| {
                 maps.retain(|id, (e, _)| {
@@ -177,7 +178,7 @@ impl<L: 'static + Lens> BindingHandler for Binding<L> {
 
     fn remove(&self, cx: &mut Context) {
         for entity in self.entity.parent_iter(&cx.tree) {
-            let key = get_storeid(&self.lens);
+            let key = self.lens.id();
 
             if let Some(stores) = cx.stores.get_mut(&entity) {
                 if let Some(store) = stores.get_mut(&key) {
